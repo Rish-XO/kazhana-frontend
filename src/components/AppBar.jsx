@@ -1,31 +1,31 @@
-import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material";
+import { AppBar, Toolbar, IconButton, Box } from "@mui/material";
 import { Search, Notifications, People, Folder } from "@mui/icons-material";
+import logo from "../assets/logoKazhana.png"; // Import the logo
 
 export default function DashboardAppBar() {
   return (
     <AppBar
       position="fixed"
       sx={{
-        bgcolor: "#121212",
+        bgcolor: "#1B1A1A", // Navbar background color
         boxShadow: "none",
         borderBottom: "1px solid #2D3748",
-        width: "100%", // Full width
-        left: 0, // Ensure it starts from the left
-        zIndex: (theme) => theme.zIndex.drawer + 1, // Ensure it stays above the sidebar
+        width: "100%",
+        left: 0,
+        zIndex: (theme) => theme.zIndex.drawer + 1, // Ensure navbar is above sidebar
       }}
     >
       <Toolbar>
         {/* Logo on the left */}
-        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1E90FF", pl: 2 }}>
-          d
-        </Typography>
+        <Box sx={{ pl: 2, display: "flex", alignItems: "center" }}>
+          <img src={logo} alt="Logo" style={{ height: "40px" }} /> {/* Logo */}
+        </Box>
 
         {/* Centered Navigation Links */}
         <Box sx={{ display: "flex", flexGrow: 1, justifyContent: "center" }}>
           {["Home", "Portfolio", "Mutual Funds", "Tools", "Transactions"].map((text, index) => (
-            <Typography
+            <Box
               key={text}
-              variant="body1"
               sx={{
                 mx: 3,
                 cursor: "pointer",
@@ -35,7 +35,7 @@ export default function DashboardAppBar() {
               }}
             >
               {text}
-            </Typography>
+            </Box>
           ))}
         </Box>
 

@@ -5,12 +5,12 @@ export default function Sidebar() {
     <Drawer
       variant="permanent"
       sx={{
-        width: 120,
+        width: 200,
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: 120,
+          width: 200,
           boxSizing: "border-box",
-          backgroundColor: "#1A1A1A",
+          backgroundColor: "#1B1A1A",
           color: "white",
           borderRight: "1px solid #2D3748",
         },
@@ -20,7 +20,7 @@ export default function Sidebar() {
         <List>
           <ListItem
             sx={{
-              bgcolor: "#666",
+              bgcolor: "#3D3D3D",
               color: "white",
               textAlign: "center",
               borderRadius: "5px",
