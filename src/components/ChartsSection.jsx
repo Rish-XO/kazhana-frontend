@@ -21,7 +21,7 @@ const performanceData = [
   { date: "9 Mar", value: 590000 },
 ];
 
-// Sample Sector Allocation Data
+// Sample Sector Allocation Data (Sorted Dynamically)
 const sectorAllocation = [
   { name: "Financial", percentage: 34, amount: "₹1,96,000" },
   { name: "Healthcare", percentage: 14.5, amount: "₹83,750" },
@@ -29,11 +29,17 @@ const sectorAllocation = [
   { name: "Consumer Goods", percentage: 9.5, amount: "₹55,000" },
   { name: "Energy", percentage: 9.5, amount: "₹55,000" },
   { name: "Other Sectors", percentage: 9.5, amount: "₹55,000" },
-];
+].sort((a, b) => b.percentage - a.percentage); // Sort dynamically by percentage
 
 export default function ChartsSection() {
   const [activeTab, setActiveTab] = useState(1);
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
+
+  // Calculate total percentage for the first row (first 3 sectors)
+  const firstRowTotal = sectorAllocation.slice(0, 3).reduce((sum, sector) => sum + sector.percentage, 0);
+  
+  // Calculate total percentage for the second row (remaining sectors)
+  const secondRowTotal = sectorAllocation.slice(3).reduce((sum, sector) => sum + sector.percentage, 0);
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -45,34 +51,19 @@ export default function ChartsSection() {
           textColor="inherit"
           indicatorColor="primary"
           sx={{
-            "& .MuiTabs-indicator": { backgroundColor: "#1E90FF" }, // Indicator color
+            "& .MuiTabs-indicator": { backgroundColor: "#1E90FF" },
             "& .MuiTab-root": {
               textTransform: "none",
               fontSize: "16px",
               fontWeight: "normal",
               color: "#A0AEC0",
-              "&.Mui-selected": {
-                color: "white",
-                fontWeight: "bold",
-              },
-              "&:focus": {
-                outline: "none", // Removes white border
-              },
+              "&.Mui-selected": { color: "white", fontWeight: "bold" },
+              "&:focus": { outline: "none" },
             },
           }}
         >
-          <Tab
-            label="Performance Metrics"
-            sx={{
-              "&:focus": { outline: "none" }, // Extra safeguard to remove focus outline
-            }}
-          />
-          <Tab
-            label="Portfolio Composition"
-            sx={{
-              "&:focus": { outline: "none" }, // Extra safeguard to remove focus outline
-            }}
-          />
+          <Tab label="Performance Metrics" sx={{ "&:focus": { outline: "none" } }} />
+          <Tab label="Portfolio Composition" sx={{ "&:focus": { outline: "none" } }} />
         </Tabs>
       </Box>
 
@@ -87,11 +78,11 @@ export default function ChartsSection() {
               mb: 3,
               p: 2,
               borderRadius: "10px",
-              bgcolor: "#262626", 
-              width: "fit-content", 
+              bgcolor: "#262626",
+              width: "fit-content",
             }}
           >
-            <Typography variant="h4" sx={{ color: "white"  }}>
+            <Typography variant="h4" sx={{ color: "white" }}>
               ₹5,50,000
             </Typography>
             <Typography variant="body2" sx={{ color: "#4ADE80", mt: 1 }}>
@@ -112,15 +103,8 @@ export default function ChartsSection() {
                     <stop offset="95%" stopColor="#0077B6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#2D3748"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fill: "#A0AEC0", fontSize: 12 }}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" vertical={false} />
+                <XAxis dataKey="date" tick={{ fill: "#A0AEC0", fontSize: 12 }} />
                 <YAxis hide={true} />
                 <Tooltip />
                 <Area
@@ -154,40 +138,66 @@ export default function ChartsSection() {
 
       {/* Portfolio Composition Content */}
       {activeTab === 1 && (
-        <Paper sx={{ p: 3, bgcolor: "#1B1A1A" }}>
+        <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px" }}>
           <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
             Sector Allocation
           </Typography>
-          <Grid container spacing={1}>
-            {sectorAllocation.map((sector) => (
-              <Grid
-                item
-                xs={12}
-                sm={sector.percentage > 30 ? 6 : 3}
+
+          {/* First Row - Top 3 Sectors */}
+          <Box sx={{ display: "flex", mb: 2, gap: 2, width: "100%" }}>
+            {sectorAllocation.slice(0, 3).map((sector, index) => (
+              <Paper
                 key={sector.name}
+                sx={{
+                  p: 3,
+                  bgcolor: index === 0 ? "#8AA6C1" : index === 1 ? "#AAB9D1" : "#CFCFE8",
+                  color: "#0F172A",
+                  textAlign: "left",
+                  borderRadius: "12px",
+                  flex: `${sector.percentage / firstRowTotal}`,
+                  minHeight: 160,
+                }}
               >
-                <Paper
-                  sx={{
-                    p: 2,
-                    bgcolor: "rgba(226, 232, 240, 0.1)",
-                    color: "white",
-                    textAlign: "center",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: "#A0AEC0", mb: 1 }}>
-                    {sector.name}
-                  </Typography>
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    {sector.percentage}%
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "#A0AEC0" }}>
-                    {sector.amount}
-                  </Typography>
-                </Paper>
-              </Grid>
+                <Typography variant="body1" sx={{ fontWeight: "600" }}>
+                  {sector.name}
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#374151" }}>
+                  {sector.amount}
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
+                  {sector.percentage}%
+                </Typography>
+              </Paper>
             ))}
-          </Grid>
+          </Box>
+
+          {/* Second Row - Remaining Sectors */}
+          <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+            {sectorAllocation.slice(3).map((sector) => (
+              <Paper
+                key={sector.name}
+                sx={{
+                  p: 3,
+                  bgcolor: "#CFCFE8",
+                  color: "#0F172A",
+                  textAlign: "left",
+                  borderRadius: "12px",
+                  flex: `${sector.percentage / secondRowTotal}`,
+                  minHeight: 120,
+                }}
+              >
+                <Typography variant="body1" sx={{ fontWeight: "600" }}>
+                  {sector.name}
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#374151" }}>
+                  {sector.amount}
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
+                  {sector.percentage}%
+                </Typography>
+              </Paper>
+            ))}
+          </Box>
         </Paper>
       )}
     </Box>
