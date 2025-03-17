@@ -8,6 +8,9 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  Sankey,
+  Rectangle,
+  Layer,
 } from "recharts";
 
 // Sample Performance Data
@@ -30,6 +33,61 @@ const sectorAllocation = [
   { name: "Energy", percentage: 9.5, amount: "₹55,000" },
   { name: "Other Sectors", percentage: 9.5, amount: "₹55,000" },
 ].sort((a, b) => b.percentage - a.percentage); // Sort dynamically by percentage
+
+// Sample Fund Overlap Data for Sankey Chart
+const fundOverlapData = {
+  nodes: [
+    { name: "Nippon Large Cap Fund" },
+    { name: "Motilal Large Cap Fund" },
+    { name: "HDFC Large Cap Fund" },
+    { name: "ICICI Prudential Midcap Fund" },
+    { name: "HDFC LTD" },
+    { name: "RIL" },
+    { name: "INFY" },
+    { name: "TCS" },
+    { name: "HDFCBANK" },
+    { name: "BHARTIARTL" },
+  ],
+  links: [
+    { source: 0, target: 4, value: 8 },
+    { source: 0, target: 5, value: 6 },
+    { source: 0, target: 6, value: 5 },
+    { source: 0, target: 7, value: 4 },
+    { source: 0, target: 8, value: 3 },
+    { source: 0, target: 9, value: 2 },
+    { source: 1, target: 4, value: 7 },
+    { source: 1, target: 5, value: 6 },
+    { source: 1, target: 6, value: 5 },
+    { source: 1, target: 7, value: 4 },
+    { source: 1, target: 8, value: 3 },
+    { source: 1, target: 9, value: 2 },
+    { source: 2, target: 4, value: 5 },
+    { source: 2, target: 5, value: 4 },
+    { source: 2, target: 6, value: 3 },
+    { source: 2, target: 7, value: 2 },
+    { source: 3, target: 8, value: 4 },
+    { source: 3, target: 9, value: 3 },
+  ],
+};
+
+// Custom Sankey Node component
+const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
+  // Left side fund nodes
+  const isFundNode = index < 4;
+  const colors = ["#C39B77", "#3A6EA5", "#8D6E63", "#7D8C38"];
+  const stockColors = ["#FFC107", "#4CAF50", "#9C27B0", "#00BCD4", "#F44336", "#FF9800"];
+
+  return (
+    <Rectangle
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill={isFundNode ? colors[index % colors.length] : stockColors[(index - 4) % stockColors.length]}
+      fillOpacity={0.9}
+    />
+  );
+};
 
 export default function ChartsSection() {
   const [activeTab, setActiveTab] = useState(1);
@@ -138,67 +196,108 @@ export default function ChartsSection() {
 
       {/* Portfolio Composition Content */}
       {activeTab === 1 && (
-        <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px" }}>
-          <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
-            Sector Allocation
-          </Typography>
+        <>
+          <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px" }}>
+            <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
+              Sector Allocation
+            </Typography>
 
-          {/* First Row - Top 3 Sectors */}
-          <Box sx={{ display: "flex", mb: 2, gap: 2, width: "100%" }}>
-            {sectorAllocation.slice(0, 3).map((sector, index) => (
-              <Paper
-                key={sector.name}
-                sx={{
-                  p: 3,
-                  bgcolor: index === 0 ? "#8AA6C1" : index === 1 ? "#AAB9D1" : "#CFCFE8",
-                  color: "#0F172A",
-                  textAlign: "left",
-                  borderRadius: "12px",
-                  flex: `${sector.percentage / firstRowTotal}`,
-                  minHeight: 160,
-                }}
-              >
-                <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                  {sector.name}
-                </Typography>
-                <Typography variant="body2" sx={{ color: "#374151" }}>
-                  {sector.amount}
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
-                  {sector.percentage}%
-                </Typography>
-              </Paper>
-            ))}
-          </Box>
+            {/* First Row - Top 3 Sectors */}
+            <Box sx={{ display: "flex", mb: 2, gap: 2, width: "100%" }}>
+              {sectorAllocation.slice(0, 3).map((sector, index) => (
+                <Paper
+                  key={sector.name}
+                  sx={{
+                    p: 3,
+                    bgcolor: index === 0 ? "#8AA6C1" : index === 1 ? "#AAB9D1" : "#CFCFE8",
+                    color: "#0F172A",
+                    textAlign: "left",
+                    borderRadius: "12px",
+                    flex: `${sector.percentage / firstRowTotal}`,
+                    minHeight: 160,
+                  }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "600" }}>
+                    {sector.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "#374151" }}>
+                    {sector.amount}
+                  </Typography>
+                  <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
+                    {sector.percentage}%
+                  </Typography>
+                </Paper>
+              ))}
+            </Box>
 
-          {/* Second Row - Remaining Sectors */}
-          <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
-            {sectorAllocation.slice(3).map((sector) => (
-              <Paper
-                key={sector.name}
-                sx={{
-                  p: 3,
-                  bgcolor: "#CFCFE8",
-                  color: "#0F172A",
-                  textAlign: "left",
-                  borderRadius: "12px",
-                  flex: `${sector.percentage / secondRowTotal}`,
-                  minHeight: 120,
-                }}
-              >
-                <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                  {sector.name}
+            {/* Second Row - Remaining Sectors */}
+            <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+              {sectorAllocation.slice(3).map((sector) => (
+                <Paper
+                  key={sector.name}
+                  sx={{
+                    p: 3,
+                    bgcolor: "#CFCFE8",
+                    color: "#0F172A",
+                    textAlign: "left",
+                    borderRadius: "12px",
+                    flex: `${sector.percentage / secondRowTotal}`,
+                    minHeight: 120,
+                  }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "600" }}>
+                    {sector.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "#374151" }}>
+                    {sector.amount}
+                  </Typography>
+                  <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
+                    {sector.percentage}%
+                  </Typography>
+                </Paper>
+              ))}
+            </Box>
+          </Paper>
+
+          {/* Fund Overlap Analysis - Sankey Chart */}
+          <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px", mt: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
+              Overlap Analysis
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1, color: "#A0AEC0" }}>
+              Comparing: Motilal Large Cap Fund and Nippon Large Cap Fund
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#FFC107", mr: 1 }}></Box>
+                <Typography variant="body2" sx={{ color: "#A0AEC0" }}>
+                  X Stocks Overlap across these funds.
                 </Typography>
-                <Typography variant="body2" sx={{ color: "#374151" }}>
-                  {sector.amount}
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#4CAF50", mr: 1 }}></Box>
+                <Typography variant="body2" sx={{ color: "#A0AEC0" }}>
+                  Y% Average Overlap in holdings.
                 </Typography>
-                <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
-                  {sector.percentage}%
-                </Typography>
-              </Paper>
-            ))}
-          </Box>
-        </Paper>
+              </Box>
+            </Box>
+
+            {/* Sankey Chart */}
+            <Box sx={{ height: 400, mt: 2 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <Sankey
+                  data={fundOverlapData}
+                  node={<CustomSankeyNode />}
+                  link={{ stroke: "#374151", strokeOpacity: 0.2 }}
+                  nodePadding={50}
+                  margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                >
+                  <Tooltip />
+                </Sankey>
+              </ResponsiveContainer>
+            </Box>
+          </Paper>
+        </>
       )}
     </Box>
   );
