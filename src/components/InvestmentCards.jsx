@@ -34,7 +34,7 @@ export default function InvestmentCards() {
       container 
       spacing={2} 
       justifyContent="center"
-      sx={{ mb: 4, mt: 2, gap: 1 }}
+      sx={{ mb: 6, mt: 2, gap: 1 }}
     >
       {investments.map((item, index) => (
         <Grid item key={index}>
@@ -44,7 +44,7 @@ export default function InvestmentCards() {
               height: "100px",
               bgcolor: "#112240", // Adjusted to match screenshot
               color: "white",
-              padding: "16px", // Exact padding
+              padding: "15px", // Exact padding
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",

@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import DashboardAppBar from "./components/AppBar";
 import Sidebar from "./components/Sidebar";
 import InvestmentCards from "./components/InvestmentCards";
+import ChartsSection from "./components/ChartsSection";
 
 export default function Dashboard() {
   return (
@@ -24,6 +25,10 @@ export default function Dashboard() {
 
           {/* Investment Cards */}
           <InvestmentCards />
+
+          {/* Charts Section with Tabs */}
+          <ChartsSection />
+
         </Box>
       </Box>
     </Box>
