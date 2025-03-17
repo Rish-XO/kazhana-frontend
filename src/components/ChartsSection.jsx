@@ -71,21 +71,49 @@ const fundOverlapData = {
 };
 
 // Custom Sankey Node component
+// Replace your current CustomSankeyNode with this combined version
 const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
   // Left side fund nodes
   const isFundNode = index < 4;
   const colors = ["#C39B77", "#3A6EA5", "#8D6E63", "#7D8C38"];
-  const stockColors = ["#FFC107", "#4CAF50", "#9C27B0", "#00BCD4", "#F44336", "#FF9800"];
+  const stockColors = [
+    "#FFC107",
+    "#4CAF50",
+    "#9C27B0",
+    "#00BCD4",
+    "#F44336",
+    "#FF9800",
+  ];
+
+  // Text positioning
+  const textAnchor = isFundNode ? "end" : "start";
+  const textX = isFundNode ? x - 10 : x + width + 10;
 
   return (
-    <Rectangle
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-      fill={isFundNode ? colors[index % colors.length] : stockColors[(index - 4) % stockColors.length]}
-      fillOpacity={0.9}
-    />
+    <Layer>
+      <Rectangle
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={
+          isFundNode
+            ? colors[index % colors.length]
+            : stockColors[(index - 4) % stockColors.length]
+        }
+        fillOpacity={0.9}
+      />
+      <text
+        x={textX}
+        y={y + height / 2}
+        textAnchor={textAnchor}
+        dominantBaseline="middle"
+        fill="#FFFFFF"
+        fontSize={12}
+      >
+        {payload.name}
+      </text>
+    </Layer>
   );
 };
 
@@ -94,10 +122,14 @@ export default function ChartsSection() {
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
 
   // Calculate total percentage for the first row (first 3 sectors)
-  const firstRowTotal = sectorAllocation.slice(0, 3).reduce((sum, sector) => sum + sector.percentage, 0);
-  
+  const firstRowTotal = sectorAllocation
+    .slice(0, 3)
+    .reduce((sum, sector) => sum + sector.percentage, 0);
+
   // Calculate total percentage for the second row (remaining sectors)
-  const secondRowTotal = sectorAllocation.slice(3).reduce((sum, sector) => sum + sector.percentage, 0);
+  const secondRowTotal = sectorAllocation
+    .slice(3)
+    .reduce((sum, sector) => sum + sector.percentage, 0);
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -120,8 +152,14 @@ export default function ChartsSection() {
             },
           }}
         >
-          <Tab label="Performance Metrics" sx={{ "&:focus": { outline: "none" } }} />
-          <Tab label="Portfolio Composition" sx={{ "&:focus": { outline: "none" } }} />
+          <Tab
+            label="Performance Metrics"
+            sx={{ "&:focus": { outline: "none" } }}
+          />
+          <Tab
+            label="Portfolio Composition"
+            sx={{ "&:focus": { outline: "none" } }}
+          />
         </Tabs>
       </Box>
 
@@ -161,8 +199,15 @@ export default function ChartsSection() {
                     <stop offset="95%" stopColor="#0077B6" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" vertical={false} />
-                <XAxis dataKey="date" tick={{ fill: "#A0AEC0", fontSize: 12 }} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#2D3748"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fill: "#A0AEC0", fontSize: 12 }}
+                />
                 <YAxis hide={true} />
                 <Tooltip />
                 <Area
@@ -178,7 +223,9 @@ export default function ChartsSection() {
           </Box>
 
           {/* Timeframe Buttons */}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, gap: 2 }}>
+          <Box
+            sx={{ display: "flex", justifyContent: "center", mt: 2, gap: 2 }}
+          >
             {["1M", "3M", "6M", "1Y", "3Y", "MAX"].map((period) => (
               <Button
                 key={period}
@@ -209,7 +256,12 @@ export default function ChartsSection() {
                   key={sector.name}
                   sx={{
                     p: 3,
-                    bgcolor: index === 0 ? "#8AA6C1" : index === 1 ? "#AAB9D1" : "#CFCFE8",
+                    bgcolor:
+                      index === 0
+                        ? "#8AA6C1"
+                        : index === 1
+                        ? "#AAB9D1"
+                        : "#CFCFE8",
                     color: "#0F172A",
                     textAlign: "left",
                     borderRadius: "12px",
@@ -269,13 +321,29 @@ export default function ChartsSection() {
             </Typography>
             <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#FFC107", mr: 1 }}></Box>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: "#FFC107",
+                    mr: 1,
+                  }}
+                ></Box>
                 <Typography variant="body2" sx={{ color: "#A0AEC0" }}>
                   X Stocks Overlap across these funds.
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#4CAF50", mr: 1 }}></Box>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: "#4CAF50",
+                    mr: 1,
+                  }}
+                ></Box>
                 <Typography variant="body2" sx={{ color: "#A0AEC0" }}>
                   Y% Average Overlap in holdings.
                 </Typography>
@@ -283,14 +351,16 @@ export default function ChartsSection() {
             </Box>
 
             {/* Sankey Chart */}
+            {/* Sankey Chart */}
             <Box sx={{ height: 400, mt: 2 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <Sankey
                   data={fundOverlapData}
                   node={<CustomSankeyNode />}
-                  link={{ stroke: "#374151", strokeOpacity: 0.2 }}
+                  link={{ stroke: "#374151", strokeOpacity: 0.4 }}
                   nodePadding={50}
-                  margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                  nodeWidth={15}
+                  margin={{ top: 10, right: 150, bottom: 10, left: 150 }}
                 >
                   <Tooltip />
                 </Sankey>
