@@ -15,7 +15,7 @@ export default function Dashboard() {
 
         {/* Content should not be hidden under the fixed AppBar */}
         <Box sx={{ p: 4, pt: 10 }}> {/* Added `pt:10` to push content below navbar */}
-          <Typography variant="h4" sx={{ fontWeight: "bold", mb: 0.5 }}>
+          <Typography variant="h5" sx={{  mb: 0.5 }}>
             Good morning, Yashna!
           </Typography>
           <Typography variant="body1" sx={{ color: "#A0AEC0" }}>

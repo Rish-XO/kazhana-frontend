@@ -30,18 +30,25 @@ const investments = [
 
 export default function InvestmentCards() {
   return (
-    <Grid container spacing={2} sx={{ mb: 4 }}>
+    <Grid 
+      container 
+      spacing={2} 
+      justifyContent="center"
+      sx={{ mb: 4, mt: 2, gap: 1 }}
+    >
       {investments.map((item, index) => (
-        <Grid item xs={12} sm={6} md={3} key={index}>
+        <Grid item key={index}>
           <Paper
             sx={{
-              p: 2,
-              bgcolor: "#1E2A38",
+              width: "200px",
+              height: "100px",
+              bgcolor: "#112240", // Adjusted to match screenshot
               color: "white",
-              height: "100%",
+              padding: "16px", // Exact padding
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
+              borderRadius: "8px",
             }}
           >
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -53,6 +60,7 @@ export default function InvestmentCards() {
                   color: item.isPositive ? "#4ADE80" : "#EF4444",
                   display: "flex",
                   alignItems: "center",
+                  fontSize: "14px",
                 }}
               >
                 {item.isPositive ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />}
