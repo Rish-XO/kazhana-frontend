@@ -32,7 +32,7 @@ const sectorAllocation = [
 ];
 
 export default function ChartsSection() {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1);
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
 
   return (
@@ -154,11 +154,11 @@ export default function ChartsSection() {
 
       {/* Portfolio Composition Content */}
       {activeTab === 1 && (
-        <Paper sx={{ p: 3, bgcolor: "#1E1E1E" }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
+        <Paper sx={{ p: 3, bgcolor: "#1B1A1A" }}>
+          <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
             Sector Allocation
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             {sectorAllocation.map((sector) => (
               <Grid
                 item
