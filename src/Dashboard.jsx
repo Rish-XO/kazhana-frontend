@@ -8,7 +8,6 @@ import axios from "axios";
 
 export default function Dashboard() {
   const [investmentData, setInvestmentData] = useState(null);
-  const [performanceData, setPerformanceData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,14 +18,6 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Error fetching investment overview:", error);
       }
-
-      try {
-        const performanceRes = await axios.get("http://127.0.0.1:8000/performance_summary");
-        setPerformanceData(performanceRes.data);
-      } catch (error) {
-        console.error("Error fetching performance summary:", error);
-      }
-
       setLoading(false); // Ensure loading state is only set after both calls
     }
 
@@ -55,7 +46,7 @@ export default function Dashboard() {
           <InvestmentCards investmentData={investmentData} loading={loading} />
 
           {/* Charts Section with Tabs */}
-          <ChartsSection data={performanceData} />
+          <ChartsSection />
 
         </Box>
       </Box>

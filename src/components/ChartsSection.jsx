@@ -118,7 +118,7 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
   );
 };
 
-export default function ChartsSection({data}) {
+export default function ChartsSection() {
   const [activeTab, setActiveTab] = useState(0);
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
   const [performanceData, setPerformanceData] = useState(null);
