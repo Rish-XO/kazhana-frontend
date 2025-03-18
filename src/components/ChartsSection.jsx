@@ -14,69 +14,57 @@ import {
 } from "recharts";
 import axios from "axios";
 
-// Sample Performance Data
-// const performanceData = [
-//   { date: "7 Feb", value: 520000 },
-//   { date: "12 Feb", value: 530000 },
-//   { date: "17 Feb", value: 510000 },
-//   { date: "22 Feb", value: 540000 },
-//   { date: "27 Feb", value: 560000 },
-//   { date: "4 Mar", value: 570000 },
-//   { date: "9 Mar", value: 590000 },
-// ];
-
 // Sample Sector Allocation Data (Sorted Dynamically)
-const sectorAllocation = [
-  { name: "Financial", percentage: 34, amount: "₹1,96,000" },
-  { name: "Healthcare", percentage: 14.5, amount: "₹83,750" },
-  { name: "Technology", percentage: 19, amount: "₹110,000" },
-  { name: "Consumer Goods", percentage: 9.5, amount: "₹55,000" },
-  { name: "Energy", percentage: 9.5, amount: "₹55,000" },
-  { name: "Other Sectors", percentage: 9.5, amount: "₹55,000" },
-].sort((a, b) => b.percentage - a.percentage); // Sort dynamically by percentage
+// const sectorAllocation = [
+//   { name: "Financial", percentage: 34, amount: "₹1,96,000" },
+//   { name: "Healthcare", percentage: 14.5, amount: "₹83,750" },
+//   { name: "Technology", percentage: 19, amount: "₹110,000" },
+//   { name: "Consumer Goods", percentage: 9.5, amount: "₹55,000" },
+//   { name: "Energy", percentage: 9.5, amount: "₹55,000" },
+//   { name: "Other Sectors", percentage: 9.5, amount: "₹55,000" },
+// ].sort((a, b) => b.percentage - a.percentage); // Sort dynamically by percentage
 
 // Sample Fund Overlap Data for Sankey Chart
-const fundOverlapData = {
-  nodes: [
-    { name: "Nippon Large Cap Fund" },
-    { name: "Motilal Large Cap Fund" },
-    { name: "HDFC Large Cap Fund" },
-    { name: "ICICI Prudential Midcap Fund" },
-    { name: "HDFC LTD" },
-    { name: "RIL" },
-    { name: "INFY" },
-    { name: "TCS" },
-    { name: "HDFCBANK" },
-    { name: "BHARTIARTL" },
-  ],
-  links: [
-    { source: 0, target: 4, value: 8 },
-    { source: 0, target: 5, value: 6 },
-    { source: 0, target: 6, value: 5 },
-    { source: 0, target: 7, value: 4 },
-    { source: 0, target: 8, value: 3 },
-    { source: 0, target: 9, value: 2 },
-    { source: 1, target: 4, value: 7 },
-    { source: 1, target: 5, value: 6 },
-    { source: 1, target: 6, value: 5 },
-    { source: 1, target: 7, value: 4 },
-    { source: 1, target: 8, value: 3 },
-    { source: 1, target: 9, value: 2 },
-    { source: 2, target: 4, value: 5 },
-    { source: 2, target: 5, value: 4 },
-    { source: 2, target: 6, value: 3 },
-    { source: 2, target: 7, value: 2 },
-    { source: 3, target: 8, value: 4 },
-    { source: 3, target: 9, value: 3 },
-  ],
-};
+// const fundOverlapData = {
+//   nodes: [
+//     { name: "Nippon Large Cap Fund" },
+//     { name: "Motilal Large Cap Fund" },
+//     { name: "HDFC Large Cap Fund" },
+//     { name: "ICICI Prudential Midcap Fund" },
+//     { name: "HDFC LTD" },
+//     { name: "RIL" },
+//     { name: "INFY" },
+//     { name: "TCS" },
+//     { name: "HDFCBANK" },
+//     { name: "BHARTIARTL" },
+//   ],
+//   links: [
+//     { source: 0, target: 4, value: 8 },
+//     { source: 0, target: 5, value: 6 },
+//     { source: 0, target: 6, value: 5 },
+//     { source: 0, target: 7, value: 4 },
+//     { source: 0, target: 8, value: 3 },
+//     { source: 0, target: 9, value: 2 },
+//     { source: 1, target: 4, value: 7 },
+//     { source: 1, target: 5, value: 6 },
+//     { source: 1, target: 6, value: 5 },
+//     { source: 1, target: 7, value: 4 },
+//     { source: 1, target: 8, value: 3 },
+//     { source: 1, target: 9, value: 2 },
+//     { source: 2, target: 4, value: 5 },
+//     { source: 2, target: 5, value: 4 },
+//     { source: 2, target: 6, value: 3 },
+//     { source: 2, target: 7, value: 2 },
+//     { source: 3, target: 8, value: 4 },
+//     { source: 3, target: 9, value: 3 },
+//   ],
+// };
 
 // Custom Sankey Node component
 // Replace your current CustomSankeyNode with this combined version
 const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
-  // Left side fund nodes
-  const isFundNode = index < 4;
-  const colors = ["#C39B77", "#3A6EA5", "#8D6E63", "#7D8C38"];
+  const isFundNode = index < 5; // Funds are in the first 5 indices
+  const colors = ["#C39B77", "#3A6EA5", "#8D6E63", "#7D8C38", "#DDA15E"];
   const stockColors = [
     "#FFC107",
     "#4CAF50",
@@ -86,9 +74,9 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
     "#FF9800",
   ];
 
-  // Text positioning
+  // Adjust text positioning
   const textAnchor = isFundNode ? "end" : "start";
-  const textX = isFundNode ? x - 10 : x + width + 10;
+  const textX = isFundNode ? x - 20 : x + width + 10; // Adjusted left padding
 
   return (
     <Layer>
@@ -100,7 +88,7 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
         fill={
           isFundNode
             ? colors[index % colors.length]
-            : stockColors[(index - 4) % stockColors.length]
+            : stockColors[(index - 5) % stockColors.length]
         }
         fillOpacity={0.9}
       />
@@ -111,8 +99,15 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
         dominantBaseline="middle"
         fill="#FFFFFF"
         fontSize={12}
+        style={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }} // Prevents overlap
       >
-        {payload.name}
+        {payload.name.length > 20
+          ? payload.name.substring(0, 20) + "..."
+          : payload.name}
       </text>
     </Layer>
   );
@@ -123,7 +118,21 @@ export default function ChartsSection() {
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
   const [performanceData, setPerformanceData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sectorAllocation, setSectorAllocation] = useState([]);
+  const [hoveredSector, setHoveredSector] = useState(null);
+  const [fundOverlapData, setFundOverlapData] = useState(null);
 
+  useEffect(() => {
+    async function fetchFundOverlap() {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/fund_overlap");
+        setFundOverlapData(response.data);
+      } catch (error) {
+        console.error("Error fetching fund overlap data:", error);
+      }
+    }
+    fetchFundOverlap();
+  }, []);
 
   useEffect(() => {
     async function fetchPerformanceData() {
@@ -140,13 +149,40 @@ export default function ChartsSection() {
     fetchPerformanceData();
   }, [activeTimeframe]); // Refetch data when timeframe changes
 
+  useEffect(() => {
+    async function fetchSectorAllocation() {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/sector_allocation"
+        );
+        setSectorAllocation(response.data); // Set API data
+      } catch (error) {
+        console.error("Error fetching sector allocation:", error);
+      }
+      setLoading(false);
+    }
+
+    fetchSectorAllocation();
+  }, []);
+
   if (loading || !performanceData) {
-    return <Typography sx={{ color: "white", textAlign: "center" }}>Loading...</Typography>;
+    return (
+      <Typography sx={{ color: "white", textAlign: "center" }}>
+        Loading...
+      </Typography>
+    );
   }
 
-//   if (!data) {
-//     return <Typography sx={{ color: "white", textAlign: "center" }}>Loading...</Typography>;
-//   }
+  // Normalize sector allocation percentages so they sum to 100%
+  const totalInvestment = sectorAllocation.reduce(
+    (sum, sector) => sum + sector.amount,
+    0
+  );
+
+  const normalizedSectorAllocation = sectorAllocation.map((sector) => ({
+    ...sector,
+    percentage: ((sector.amount / totalInvestment) * 100).toFixed(2), // Ensures total is 100%
+  }));
 
   // Calculate total percentage for the first row (first 3 sectors)
   const firstRowTotal = sectorAllocation
@@ -206,11 +242,22 @@ export default function ChartsSection() {
             }}
           >
             <Typography variant="h4" sx={{ color: "white" }}>
-            ₹{performanceData.current_investment_value.toLocaleString()}
+              ₹{performanceData.current_investment_value.toLocaleString()}
             </Typography>
             <Typography variant="body2" sx={{ color: "#4ADE80", mt: 1 }}>
-            ↑ ₹{(performanceData.current_investment_value - performanceData.initial_investment_value).toLocaleString()} | 
-            {((performanceData.current_investment_value - performanceData.initial_investment_value) / performanceData.initial_investment_value * 100).toFixed(2)}%
+              ↑ ₹
+              {(
+                performanceData.current_investment_value -
+                performanceData.initial_investment_value
+              ).toLocaleString()}{" "}
+              |
+              {(
+                ((performanceData.current_investment_value -
+                  performanceData.initial_investment_value) /
+                  performanceData.initial_investment_value) *
+                100
+              ).toFixed(2)}
+              %
             </Typography>
           </Box>
 
@@ -279,61 +326,64 @@ export default function ChartsSection() {
 
             {/* First Row - Top 3 Sectors */}
             <Box sx={{ display: "flex", mb: 2, gap: 2, width: "100%" }}>
-              {sectorAllocation.slice(0, 3).map((sector, index) => (
+              {normalizedSectorAllocation.map((sector) => (
                 <Paper
                   key={sector.name}
+                  onMouseEnter={() => setHoveredSector(sector)}
+                  onMouseLeave={() => setHoveredSector(null)}
                   sx={{
                     p: 3,
                     bgcolor:
-                      index === 0
-                        ? "#8AA6C1"
-                        : index === 1
-                        ? "#AAB9D1"
-                        : "#CFCFE8",
+                      hoveredSector?.name === sector.name
+                        ? "#3A6EA5"
+                        : "#8AA6C1",
                     color: "#0F172A",
                     textAlign: "left",
                     borderRadius: "12px",
-                    flex: `${sector.percentage / firstRowTotal}`,
+                    flex: `${sector.percentage / 100}`, // Adjusts dynamically
                     minHeight: 160,
+                    transition: "all 0.3s ease-in-out",
+                    position: "relative",
                   }}
                 >
-                  <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                    {sector.name}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "#374151" }}>
-                    {sector.amount}
-                  </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
-                    {sector.percentage}%
-                  </Typography>
-                </Paper>
-              ))}
-            </Box>
-
-            {/* Second Row - Remaining Sectors */}
-            <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
-              {sectorAllocation.slice(3).map((sector) => (
-                <Paper
-                  key={sector.name}
-                  sx={{
-                    p: 3,
-                    bgcolor: "#CFCFE8",
-                    color: "#0F172A",
-                    textAlign: "left",
-                    borderRadius: "12px",
-                    flex: `${sector.percentage / secondRowTotal}`,
-                    minHeight: 120,
-                  }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                    {sector.name}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "#374151" }}>
-                    {sector.amount}
-                  </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1 }}>
-                    {sector.percentage}%
-                  </Typography>
+                  {hoveredSector?.name === sector.name ? (
+                    <Grid container spacing={1}>
+                      {hoveredSector.sub_allocations.map((sub) => (
+                        <Grid item xs={Math.round((sub.percentage / 100) * 12)}>
+                          <Paper
+                            sx={{
+                              p: 1,
+                              bgcolor: "#D6E4F0",
+                              textAlign: "center",
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: "bold" }}
+                            >
+                              {sub.name}
+                            </Typography>
+                            <Typography variant="body2">
+                              {sub.percentage}%
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <>
+                      <Typography variant="body1" sx={{ fontWeight: "600" }}>
+                        {sector.name}
+                      </Typography>
+                      <Typography variant="body2">{`₹${sector.amount.toLocaleString()}`}</Typography>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: "bold", mt: 1 }}
+                      >
+                        {sector.percentage}%
+                      </Typography>
+                    </>
+                  )}
                 </Paper>
               ))}
             </Box>
@@ -385,9 +435,9 @@ export default function ChartsSection() {
                   data={fundOverlapData}
                   node={<CustomSankeyNode />}
                   link={{ stroke: "#374151", strokeOpacity: 0.4 }}
-                  nodePadding={50}
-                  nodeWidth={15}
-                  margin={{ top: 10, right: 150, bottom: 10, left: 150 }}
+                  nodePadding={60} // Increased padding to prevent overlap
+                  nodeWidth={20} // Adjust width for better spacing
+                  margin={{ top: 10, right: 180, bottom: 10, left: 180 }} // Adjust margins for text visibility
                 >
                   <Tooltip />
                 </Sankey>
