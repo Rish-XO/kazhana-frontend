@@ -117,9 +117,13 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
   );
 };
 
-export default function ChartsSection() {
+export default function ChartsSection({data}) {
   const [activeTab, setActiveTab] = useState(0);
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
+
+  if (!data) {
+    return <Typography sx={{ color: "white", textAlign: "center" }}>Loading...</Typography>;
+  }
 
   // Calculate total percentage for the first row (first 3 sectors)
   const firstRowTotal = sectorAllocation
@@ -179,10 +183,10 @@ export default function ChartsSection() {
             }}
           >
             <Typography variant="h4" sx={{ color: "white" }}>
-              ₹5,50,000
+            ₹{data.current_investment_value.toLocaleString()}
             </Typography>
             <Typography variant="body2" sx={{ color: "#4ADE80", mt: 1 }}>
-              ↑ ₹50,000 | 10%
+            ↑ ₹{(data.current_investment_value - data.initial_investment_value).toLocaleString()} | {((data.current_investment_value - data.initial_investment_value) / data.initial_investment_value * 100).toFixed(2)}%
             </Typography>
           </Box>
 
@@ -190,7 +194,7 @@ export default function ChartsSection() {
           <Box sx={{ height: 300 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={performanceData}
+                data={data.history}
                 margin={{ top: 10, right: 20, left: 20, bottom: 10 }}
               >
                 <defs>
@@ -350,7 +354,6 @@ export default function ChartsSection() {
               </Box>
             </Box>
 
-            {/* Sankey Chart */}
             {/* Sankey Chart */}
             <Box sx={{ height: 400, mt: 2 }}>
               <ResponsiveContainer width="100%" height="100%">
