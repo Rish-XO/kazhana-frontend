@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Typography, Tabs, Tab, Paper, Grid, Button } from "@mui/material";
 import {
   AreaChart,
@@ -12,17 +12,18 @@ import {
   Rectangle,
   Layer,
 } from "recharts";
+import axios from "axios";
 
 // Sample Performance Data
-const performanceData = [
-  { date: "7 Feb", value: 520000 },
-  { date: "12 Feb", value: 530000 },
-  { date: "17 Feb", value: 510000 },
-  { date: "22 Feb", value: 540000 },
-  { date: "27 Feb", value: 560000 },
-  { date: "4 Mar", value: 570000 },
-  { date: "9 Mar", value: 590000 },
-];
+// const performanceData = [
+//   { date: "7 Feb", value: 520000 },
+//   { date: "12 Feb", value: 530000 },
+//   { date: "17 Feb", value: 510000 },
+//   { date: "22 Feb", value: 540000 },
+//   { date: "27 Feb", value: 560000 },
+//   { date: "4 Mar", value: 570000 },
+//   { date: "9 Mar", value: 590000 },
+// ];
 
 // Sample Sector Allocation Data (Sorted Dynamically)
 const sectorAllocation = [
@@ -120,10 +121,32 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
 export default function ChartsSection({data}) {
   const [activeTab, setActiveTab] = useState(0);
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
+  const [performanceData, setPerformanceData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!data) {
+
+  useEffect(() => {
+    async function fetchPerformanceData() {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8000/performance_summary?timeframe=${activeTimeframe}`
+        );
+        setPerformanceData(response.data);
+      } catch (error) {
+        console.error("Error fetching performance summary:", error);
+      }
+      setLoading(false);
+    }
+    fetchPerformanceData();
+  }, [activeTimeframe]); // Refetch data when timeframe changes
+
+  if (loading || !performanceData) {
     return <Typography sx={{ color: "white", textAlign: "center" }}>Loading...</Typography>;
   }
+
+//   if (!data) {
+//     return <Typography sx={{ color: "white", textAlign: "center" }}>Loading...</Typography>;
+//   }
 
   // Calculate total percentage for the first row (first 3 sectors)
   const firstRowTotal = sectorAllocation
@@ -183,10 +206,11 @@ export default function ChartsSection({data}) {
             }}
           >
             <Typography variant="h4" sx={{ color: "white" }}>
-            ₹{data.current_investment_value.toLocaleString()}
+            ₹{performanceData.current_investment_value.toLocaleString()}
             </Typography>
             <Typography variant="body2" sx={{ color: "#4ADE80", mt: 1 }}>
-            ↑ ₹{(data.current_investment_value - data.initial_investment_value).toLocaleString()} | {((data.current_investment_value - data.initial_investment_value) / data.initial_investment_value * 100).toFixed(2)}%
+            ↑ ₹{(performanceData.current_investment_value - performanceData.initial_investment_value).toLocaleString()} | 
+            {((performanceData.current_investment_value - performanceData.initial_investment_value) / performanceData.initial_investment_value * 100).toFixed(2)}%
             </Typography>
           </Box>
 
@@ -194,7 +218,7 @@ export default function ChartsSection({data}) {
           <Box sx={{ height: 300 }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={data.history}
+                data={performanceData.history}
                 margin={{ top: 10, right: 20, left: 20, bottom: 10 }}
               >
                 <defs>
