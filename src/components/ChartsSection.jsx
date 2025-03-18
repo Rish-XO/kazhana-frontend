@@ -118,7 +118,7 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
 };
 
 export default function ChartsSection() {
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
 
   // Calculate total percentage for the first row (first 3 sectors)

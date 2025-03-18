@@ -1,34 +1,77 @@
+import { useEffect, useState } from "react";
 import { Grid, Paper, Typography, Box } from "@mui/material";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
-
-const investments = [
-  {
-    title: "Current Investment Value",
-    amount: "₹5,75,000",
-    change: "+0.6%",
-    isPositive: true,
-  },
-  {
-    title: "Initial Investment Value",
-    amount: "₹5,00,000",
-    change: "+15%",
-    isPositive: true,
-  },
-  {
-    title: "Best Performing Scheme",
-    amount: "ICICI Prudential Midcap Fund",
-    change: "+19%",
-    isPositive: true,
-  },
-  {
-    title: "Worst Performing Scheme",
-    amount: "Axis Flexi Cap Fund",
-    change: "-5%",
-    isPositive: false,
-  },
-];
+import axios from "axios";
 
 export default function InvestmentCards() {
+  const [investments, setInvestments] = useState([
+    {
+      title: "Current Investment Value",
+      amount: "Loading...",
+      change: "",
+      isPositive: true,
+    },
+    {
+      title: "Initial Investment Value",
+      amount: "Loading...",
+      change: "",
+      isPositive: true,
+    },
+    {
+      title: "Best Performing Scheme",
+      amount: "Loading...",
+      change: "",
+      isPositive: true,
+    },
+    {
+      title: "Worst Performing Scheme",
+      amount: "Loading...",
+      change: "",
+      isPositive: false,
+    },
+  ]);
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/investment_overview")
+      .then(response => {
+        const data = response.data;
+
+        // Calculate return percentage dynamically
+        const returnPercentage = ((data.current_investment_value - data.initial_investment_value) / data.initial_investment_value) * 100;
+        const isReturnPositive = returnPercentage >= 0;
+
+        setInvestments([
+          {
+            title: "Current Investment Value",
+            amount: `₹${data.current_investment_value.toLocaleString()}`,
+            change: `${returnPercentage.toFixed(1)}%`,
+            isPositive: isReturnPositive,
+          },
+          {
+            title: "Initial Investment Value",
+            amount: `₹${data.initial_investment_value.toLocaleString()}`,
+            change: `${data.initial_investment_growth}%`,
+            isPositive: true, // Always positive
+          },
+          {
+            title: "Best Performing Scheme",
+            amount: data.best_performing_scheme.name || "N/A",
+            change: `${data.best_performing_scheme.returns}%`,
+            isPositive: data.best_performing_scheme.returns >= 0,
+          },
+          {
+            title: "Worst Performing Scheme",
+            amount: data.worst_performing_scheme.name || "N/A",
+            change: `${data.worst_performing_scheme.returns}%`,
+            isPositive: data.worst_performing_scheme.returns >= 0,
+          },
+        ]);
+      })
+      .catch(error => {
+        console.error("Error fetching investment overview:", error);
+      });
+  }, []);
+
   return (
     <Grid 
       container 
@@ -42,9 +85,9 @@ export default function InvestmentCards() {
             sx={{
               width: "200px",
               height: "100px",
-              bgcolor: "#112240", // Adjusted to match screenshot
+              bgcolor: "#112240",
               color: "white",
-              padding: "15px", // Exact padding
+              padding: "15px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -55,17 +98,19 @@ export default function InvestmentCards() {
               <Typography variant="body2" sx={{ color: "#A0AEC0" }}>
                 {item.title}
               </Typography>
-              <Typography
-                sx={{
-                  color: item.isPositive ? "#4ADE80" : "#EF4444",
-                  display: "flex",
-                  alignItems: "center",
-                  fontSize: "14px",
-                }}
-              >
-                {item.isPositive ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />}
-                {item.change}
-              </Typography>
+              {item.change && (
+                <Typography
+                  sx={{
+                    color: item.isPositive ? "#4ADE80" : "#EF4444",
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "14px",
+                  }}
+                >
+                  {item.isPositive ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />}
+                  {item.change}
+                </Typography>
+              )}
             </Box>
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
               {item.amount}
