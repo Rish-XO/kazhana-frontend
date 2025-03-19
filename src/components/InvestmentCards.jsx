@@ -97,7 +97,7 @@ export default function InvestmentCards({ investmentData, loading }) {
                     alignItems: "center",
                     fontSize: "14px",
                   }}
-                >
+                > 
                   {item.isPositive ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />}
                   {item.change}
                 </Typography>
