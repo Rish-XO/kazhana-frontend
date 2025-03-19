@@ -113,6 +113,8 @@ const CustomSankeyNode = ({ x, y, width, height, index, payload }) => {
   );
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default function ChartsSection() {
   const [activeTab, setActiveTab] = useState(0);
   const [activeTimeframe, setActiveTimeframe] = useState("1M");
@@ -125,7 +127,7 @@ export default function ChartsSection() {
   useEffect(() => {
     async function fetchFundOverlap() {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/fund_overlap");
+        const response = await axios.get(`${API_BASE_URL}/fund_overlap`);
         setFundOverlapData(response.data);
       } catch (error) {
         console.error("Error fetching fund overlap data:", error);
@@ -138,7 +140,7 @@ export default function ChartsSection() {
     async function fetchPerformanceData() {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/performance_summary?timeframe=${activeTimeframe}`
+          `${API_BASE_URL}/performance_summary?timeframe=${activeTimeframe}`
         );
         setPerformanceData(response.data);
       } catch (error) {
@@ -153,7 +155,7 @@ export default function ChartsSection() {
     async function fetchSectorAllocation() {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/sector_allocation"
+          `${API_BASE_URL}/sector_allocation`
         );
         setSectorAllocation(response.data); // Set API data
       } catch (error) {
@@ -184,15 +186,22 @@ export default function ChartsSection() {
     percentage: ((sector.amount / totalInvestment) * 100).toFixed(2), // Ensures total is 100%
   }));
 
-  // Calculate total percentage for the first row (first 3 sectors)
-  const firstRowTotal = sectorAllocation
-    .slice(0, 3)
-    .reduce((sum, sector) => sum + sector.percentage, 0);
+  const sortedSectorAllocation = [...sectorAllocation]
+  .map((sector) => ({
+    ...sector,
+    percentage: ((sector.amount / totalInvestment) * 100).toFixed(2), // Ensures total is 100%
+  }))
+  .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage)); // Sort by percentage
 
-  // Calculate total percentage for the second row (remaining sectors)
-  const secondRowTotal = sectorAllocation
-    .slice(3)
-    .reduce((sum, sector) => sum + sector.percentage, 0);
+//   // Calculate total percentage for the first row (first 3 sectors)
+//   const firstRowTotal = sectorAllocation
+//     .slice(0, 3)
+//     .reduce((sum, sector) => sum + sector.percentage, 0);
+
+//   // Calculate total percentage for the second row (remaining sectors)
+//   const secondRowTotal = sectorAllocation
+//     .slice(3)
+//     .reduce((sum, sector) => sum + sector.percentage, 0);
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -319,67 +328,81 @@ export default function ChartsSection() {
       {/* Portfolio Composition Content */}
       {activeTab === 1 && (
         <>
-          <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px" }}>
+                   <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px" }}>
             <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
               Sector Allocation
             </Typography>
 
-            {/* First Row - Top 3 Sectors */}
-            <Box sx={{ display: "flex", mb: 2, gap: 2, width: "100%" }}>
-              {normalizedSectorAllocation.map((sector) => (
+            {/* Sector Allocation Cards - Fixed to be proportional to percentage */}
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+              {sortedSectorAllocation.map((sector) => (
                 <Paper
                   key={sector.name}
                   onMouseEnter={() => setHoveredSector(sector)}
                   onMouseLeave={() => setHoveredSector(null)}
                   sx={{
                     p: 3,
-                    bgcolor:
-                      hoveredSector?.name === sector.name
-                        ? "#3A6EA5"
-                        : "#8AA6C1",
+                    bgcolor: hoveredSector?.name === sector.name ? "#3A6EA5" : "#8AA6C1",
                     color: "#0F172A",
-                    textAlign: "left",
                     borderRadius: "12px",
-                    flex: `${sector.percentage / 100}`, // Adjusts dynamically
-                    minHeight: 160,
+                    // Width is proportional to percentage
+                    width: `calc(${sector.percentage}% - 16px)`,
+                    minWidth: "200px", // Minimum width for small percentages
+                    minHeight: "160px",
                     transition: "all 0.3s ease-in-out",
                     position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
-                  {hoveredSector?.name === sector.name ? (
-                    <Grid container spacing={1}>
-                      {hoveredSector.sub_allocations.map((sub) => (
-                        <Grid item xs={Math.round((sub.percentage / 100) * 12)}>
-                          <Paper
-                            sx={{
-                              p: 1,
-                              bgcolor: "#D6E4F0",
-                              textAlign: "center",
-                            }}
+                  {hoveredSector?.name === sector.name && sector.sub_allocations ? (
+                    // Only show sub-allocations when hovered, completely replacing parent content
+                    <Box sx={{ height: "100%", width: "100%" }}>
+                      <Grid container spacing={1.5}>
+                        {sector.sub_allocations.map((sub) => (
+                          <Grid 
+                            item 
+                            key={sub.name}
+                            // Size based on percentage within the sub-allocations
+                            xs={12} 
+                            sm={sub.percentage >= 20 ? 6 : 4}
                           >
-                            <Typography
-                              variant="body2"
-                              sx={{ fontWeight: "bold" }}
+                            <Paper
+                              sx={{
+                                p: 2,
+                                bgcolor: "#D6E4F0",
+                                borderRadius: "8px",
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
                             >
-                              {sub.name}
-                            </Typography>
-                            <Typography variant="body2">
-                              {sub.percentage}%
-                            </Typography>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
+                              <Typography variant="body1" sx={{ fontWeight: "bold", textAlign: "center" }}>
+                                {sub.name}
+                              </Typography>
+                              <Typography variant="h6" sx={{ fontWeight: "bold", textAlign: "center" }}>
+                                {sub.percentage}%
+                              </Typography>
+                            </Paper>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Box>
                   ) : (
+                    // Normal view (not hovered) - show parent card details
                     <>
-                      <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                        {sector.name}
-                      </Typography>
-                      <Typography variant="body2">{`₹${sector.amount.toLocaleString()}`}</Typography>
-                      <Typography
-                        variant="h5"
-                        sx={{ fontWeight: "bold", mt: 1 }}
-                      >
+                      <Box>
+                        <Typography variant="body1" sx={{ fontWeight: "600" }}>
+                          {sector.name}
+                        </Typography>
+                        <Typography variant="body2">
+                          ₹{sector.amount.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      <Typography variant="h4" sx={{ fontWeight: "bold", mt: 2 }}>
                         {sector.percentage}%
                       </Typography>
                     </>

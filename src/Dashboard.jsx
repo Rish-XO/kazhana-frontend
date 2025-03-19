@@ -5,6 +5,7 @@ import InvestmentCards from "./components/InvestmentCards";
 import ChartsSection from "./components/ChartsSection";
 import { useEffect, useState } from "react";
 import axios from "axios";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dashboard() {
   const [investmentData, setInvestmentData] = useState(null);
@@ -13,7 +14,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const investmentRes = await axios.get("http://127.0.0.1:8000/investment_overview");
+        const investmentRes = await axios.get(`${API_BASE_URL}/investment_overview`);
         setInvestmentData(investmentRes.data);
       } catch (error) {
         console.error("Error fetching investment overview:", error);
