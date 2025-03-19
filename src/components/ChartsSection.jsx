@@ -328,81 +328,67 @@ export default function ChartsSection() {
       {/* Portfolio Composition Content */}
       {activeTab === 1 && (
         <>
-                   <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px" }}>
+          <Paper sx={{ p: 3, bgcolor: "#1B1A1A", borderRadius: "10px" }}>
             <Typography variant="h6" sx={{ mb: 2, color: "white" }}>
               Sector Allocation
             </Typography>
 
-            {/* Sector Allocation Cards - Fixed to be proportional to percentage */}
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-              {sortedSectorAllocation.map((sector) => (
+            {/* First Row - Top 3 Sectors */}
+            <Box sx={{ display: "flex", mb: 2, gap: 2, width: "100%" }}>
+              {normalizedSectorAllocation.map((sector) => (
                 <Paper
                   key={sector.name}
                   onMouseEnter={() => setHoveredSector(sector)}
                   onMouseLeave={() => setHoveredSector(null)}
                   sx={{
                     p: 3,
-                    bgcolor: hoveredSector?.name === sector.name ? "#3A6EA5" : "#8AA6C1",
+                    bgcolor:
+                      hoveredSector?.name === sector.name
+                        ? "#3A6EA5"
+                        : "#8AA6C1",
                     color: "#0F172A",
+                    textAlign: "left",
                     borderRadius: "12px",
-                    // Width is proportional to percentage
-                    width: `calc(${sector.percentage}% - 16px)`,
-                    minWidth: "200px", // Minimum width for small percentages
-                    minHeight: "160px",
+                    flex: `${sector.percentage / 100}`, // Adjusts dynamically
+                    minHeight: 160,
                     transition: "all 0.3s ease-in-out",
                     position: "relative",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
                   }}
                 >
-                  {hoveredSector?.name === sector.name && sector.sub_allocations ? (
-                    // Only show sub-allocations when hovered, completely replacing parent content
-                    <Box sx={{ height: "100%", width: "100%" }}>
-                      <Grid container spacing={1.5}>
-                        {sector.sub_allocations.map((sub) => (
-                          <Grid 
-                            item 
-                            key={sub.name}
-                            // Size based on percentage within the sub-allocations
-                            xs={12} 
-                            sm={sub.percentage >= 20 ? 6 : 4}
+                  {hoveredSector?.name === sector.name ? (
+                    <Grid container spacing={1}>
+                      {hoveredSector.sub_allocations.map((sub) => (
+                        <Grid item xs={Math.round((sub.percentage / 100) * 12)}>
+                          <Paper
+                            sx={{
+                              p: 1,
+                              bgcolor: "#D6E4F0",
+                              textAlign: "center",
+                            }}
                           >
-                            <Paper
-                              sx={{
-                                p: 2,
-                                bgcolor: "#D6E4F0",
-                                borderRadius: "8px",
-                                height: "100%",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: "bold" }}
                             >
-                              <Typography variant="body1" sx={{ fontWeight: "bold", textAlign: "center" }}>
-                                {sub.name}
-                              </Typography>
-                              <Typography variant="h6" sx={{ fontWeight: "bold", textAlign: "center" }}>
-                                {sub.percentage}%
-                              </Typography>
-                            </Paper>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </Box>
+                              {sub.name}
+                            </Typography>
+                            <Typography variant="body2">
+                              {sub.percentage}%
+                            </Typography>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
                   ) : (
-                    // Normal view (not hovered) - show parent card details
                     <>
-                      <Box>
-                        <Typography variant="body1" sx={{ fontWeight: "600" }}>
-                          {sector.name}
-                        </Typography>
-                        <Typography variant="body2">
-                          ₹{sector.amount.toLocaleString()}
-                        </Typography>
-                      </Box>
-                      <Typography variant="h4" sx={{ fontWeight: "bold", mt: 2 }}>
+                      <Typography variant="body1" sx={{ fontWeight: "600" }}>
+                        {sector.name}
+                      </Typography>
+                      <Typography variant="body2">{`₹${sector.amount.toLocaleString()}`}</Typography>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: "bold", mt: 1 }}
+                      >
                         {sector.percentage}%
                       </Typography>
                     </>
